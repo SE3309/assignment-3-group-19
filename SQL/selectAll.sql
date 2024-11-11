@@ -1,4 +1,4 @@
-SELECT * FROM cell;
+SELECT * FROM cell where cellNo>1000;
 SELECT * FROM cell_Block;
 SELECT * FROM education_Course;
 SELECT * FROM guard;

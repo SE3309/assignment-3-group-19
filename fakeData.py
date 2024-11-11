@@ -18,11 +18,11 @@ try:
     # Insert cell blocks
     print("Inserting cell blocks...")
     cell_blocks = []
-    for i in range(1, 101):  # Increase the number of cell blocks
-        cell_blocks.append((i, random.choice(['Maximum', 'Medium', 'Minimum']), random.randint(50, 100), random.randint(20, 40)))
+    for i in range(1, 51):  # Increase the number of cell blocks
+        cell_blocks.append((i, random.choice(['Maximum', 'Medium', 'Minimum']), random.randint(100, 1000)))
     cursor.executemany("""
-        INSERT INTO cell_Block (cellBlockID, securityLevel, capacity, numCells)
-        VALUES (%s, %s, %s, %s)
+        INSERT INTO cell_Block (cellBlockID, securityLevel, capacity)
+        VALUES (%s, %s, %s)
     """, cell_blocks)
     connection.commit()
     print(f"Inserted {len(cell_blocks)} cell blocks.")
@@ -31,7 +31,8 @@ try:
     print("Inserting education courses...")
     courses = []
     for i in range(1, 51):  # Increase the number of courses
-        courses.append((i, random.choice(['Teaching', 'Programming', 'Accounting']), random.choice(['Education', 'Vocational']), fake.name(), random.randint(20, 50)))
+        courses.append((i, random.choice(['Teaching', 'Programming', 'Accounting']),
+                        random.choice(['Education', 'Vocational']), fake.name(), random.randint(20, 50)))
     cursor.executemany("""
         INSERT INTO education_Course (programID, programName, programType, instructorName, capacity)
         VALUES (%s, %s, %s, %s, %s)
@@ -42,9 +43,10 @@ try:
     # Insert guards
     print("Inserting guards...")
     guards = []
-    for i in range(1, 501):  # Increase the number of guards
-        guards.append((1000 + i, random.choice(range(1, 101)), fake.name(), fake.date_of_birth(minimum_age=21, maximum_age=60),
-                       random.randint(60, 100), random.randint(160, 200), random.randint(40000, 60000)))
+    for i in range(1, 5001):  # Increase the number of guards
+        guards.append(
+            (1000 + i, random.choice(range(1, 51)), fake.name(), fake.date_of_birth(minimum_age=21, maximum_age=60),
+             random.randint(60, 100), random.randint(160, 200), random.randint(40000, 60000)))
     cursor.executemany("""
         INSERT INTO guard (badgeNo, cellBlockID, guardName, dateOfBirth, weightKg, heightCm, salary)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
@@ -52,11 +54,21 @@ try:
     connection.commit()
     print(f"Inserted {len(guards)} guards.")
 
-    # Insert cells
+    # Insert cells, ensuring no cell block exceeds its capacity
     print("Inserting cells...")
     cells = []
-    for i in range(1, 1001):  # Increase the number of cells
-        cells.append((i, random.choice(range(1, 101)), random.choice(['Solitary', 'Standard', 'Double']), random.randint(1, 3)))
+    cell_counts = {i: 0 for i in range(1, 51)}  # Track the number of cells per cell block
+    cursor.execute("SELECT cellBlockID, capacity FROM cell_Block")
+    cell_block_capacities = {row[0]: row[1] for row in cursor.fetchall()}
+
+    for i in range(1, 10001):  # Increase the number of cells
+        cell_block_id = random.choice(range(1, 51))
+
+        # Ensure the cell block does not exceed its capacity
+        if cell_counts[cell_block_id] < cell_block_capacities[cell_block_id]:
+            cells.append((i, cell_block_id, random.choice(['Solitary', 'Standard', 'Double']), random.randint(1, 3)))
+            cell_counts[cell_block_id] += 1
+
     cursor.executemany("""
         INSERT INTO cell (cellNo, cellBlockID, cellType, floorNo)
         VALUES (%s, %s, %s, %s)
@@ -69,7 +81,7 @@ try:
     cursor.execute("SELECT cellNo FROM cell WHERE cellNo NOT IN (SELECT cellNo FROM prisoner)")
     available_cells = cursor.fetchall()
 
-    num_prisoners = min(len(available_cells), 900)  # Define the number of prisoners based on available cells
+    num_prisoners = min(len(available_cells), 9000)  # Define the number of prisoners based on available cells
     prisoners = []
     for i in range(1, num_prisoners + 1):
         assigned_cell = available_cells[i - 1][0]
@@ -79,9 +91,9 @@ try:
                           fake.word(ext_word_list=['Robbery', 'Fraud', 'Assault', 'Drug Trafficking', 'Theft']),
                           random.choice(['Low', 'Medium', 'High'])))
     cursor.executemany("""
-        INSERT INTO prisoner (prisonerID, cellNo, prisonerName, dateOfBirth, heightCm, weightKg, eyeColor, hairColor, offenseType, dangerLevel)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """, prisoners)
+            INSERT INTO prisoner (prisonerID, cellNo, prisonerName, dateOfBirth, heightCm, weightKg, eyeColor, hairColor, offenseType, dangerLevel)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, prisoners)
     connection.commit()
     print(f"Inserted {len(prisoners)} prisoners.")
 
@@ -101,7 +113,8 @@ try:
         num_courses = random.randint(1, 3)  # Each prisoner can take 1-3 courses
         enrolled_courses = set()
         for _ in range(num_courses):
-            available_courses = [program_id for program_id, info in course_enrollment.items() if info['enrollment'] < info['capacity']]
+            available_courses = [program_id for program_id, info in course_enrollment.items() if
+                                 info['enrollment'] < info['capacity']]
 
             if not available_courses:
                 # No courses available with capacity left
@@ -114,7 +127,8 @@ try:
                 continue
 
             # Add the unique pair to the list
-            prisoner_education_data.append((i, program_id, round(random.uniform(50, 100), 2), round(random.uniform(50, 100), 2)))
+            prisoner_education_data.append(
+                (i, program_id, round(random.uniform(50, 100), 2), round(random.uniform(50, 100), 2)))
 
             # Update in-memory enrollment count for the course
             course_enrollment[program_id]['enrollment'] += 1
@@ -131,7 +145,8 @@ try:
     print("Inserting incident reports...")
     incident_reports = []
     for i in range(1, 1001):  # Increase the number of incident reports
-        incident_reports.append((i, random.choice(range(1, num_prisoners + 1)), random.choice(range(1001, 1501)), fake.date_this_year()))
+        incident_reports.append(
+            (i, random.choice(range(1, num_prisoners + 1)), random.choice(range(1001, 1501)), fake.date_this_year()))
     cursor.executemany("""
         INSERT INTO incident_Report (incidentReportID, prisonerID, guardBadgeNo, incidentReportDate)
         VALUES (%s, %s, %s, %s)

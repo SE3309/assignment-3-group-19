@@ -9,7 +9,6 @@ CREATE TABLE cell_Block(cellBlockID INT PRIMARY KEY,
 						securityLevel VARCHAR(25) NOT NULL,
                         capacity INT NOT NULL CHECK (capacity > 0),
                         occupancy INT DEFAULT 0,
-                        numCells INT,
                         CHECK (occupancy <= capacity));
 CREATE TABLE guard(badgeNo INT PRIMARY KEY,
 				cellBlockID INT,
@@ -80,25 +79,28 @@ ADD CONSTRAINT unique_cell_no UNIQUE (cellNo);
 
 DELIMITER $$
 CREATE TRIGGER update_occupancy_after_insert
-AFTER INSERT ON prisoner
+AFTER INSERT ON cell
 FOR EACH ROW
 BEGIN
     UPDATE cell_Block
     SET occupancy = occupancy + 1
-    WHERE cellBlockID = (SELECT cellBlockID FROM cell WHERE cellNo = NEW.cellNo);
+    WHERE cellBlockID = NEW.cellBlockID;
 END$$
 DELIMITER ;
 
+
+
 DELIMITER $$
 CREATE TRIGGER update_occupancy_after_delete
-AFTER DELETE ON prisoner
+AFTER DELETE ON cell
 FOR EACH ROW
 BEGIN
     UPDATE cell_Block
     SET occupancy = occupancy - 1
-    WHERE cellBlockID = (SELECT cellBlockID FROM cell WHERE cellNo = OLD.cellNo);
+    WHERE cellBlockID = OLD.cellBlockID;
 END$$
 DELIMITER ;
+
 
 
 
