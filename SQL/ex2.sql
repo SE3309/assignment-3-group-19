@@ -52,3 +52,56 @@ CREATE TABLE prison_Transfer_Report(transferReportID INT PRIMARY KEY,
 									prisonerID INT NOT NULL,
                                     transferReportDate DATE NOT NULL,
                                     FOREIGN KEY (prisonerID) REFERENCES prisoner(prisonerID));
+                                    
+DELIMITER $$
+CREATE TRIGGER update_enrollment_after_insert
+AFTER INSERT ON prisoner_Education
+FOR EACH ROW
+BEGIN
+    UPDATE education_Course
+    SET enrolment = enrolment + 1
+    WHERE programID = NEW.programID;
+END$$
+DELIMITER ;
+                  
+DELIMITER $$
+CREATE TRIGGER update_enrollment_after_delete
+AFTER DELETE ON prisoner_Education
+FOR EACH ROW
+BEGIN
+    UPDATE education_Course
+    SET enrolment = enrolment - 1
+    WHERE programID = OLD.programID;
+END$$
+DELIMITER ;
+
+ALTER TABLE prisoner
+ADD CONSTRAINT unique_cell_no UNIQUE (cellNo);
+
+DELIMITER $$
+CREATE TRIGGER update_occupancy_after_insert
+AFTER INSERT ON prisoner
+FOR EACH ROW
+BEGIN
+    UPDATE cell_Block
+    SET occupancy = occupancy + 1
+    WHERE cellBlockID = (SELECT cellBlockID FROM cell WHERE cellNo = NEW.cellNo);
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER update_occupancy_after_delete
+AFTER DELETE ON prisoner
+FOR EACH ROW
+BEGIN
+    UPDATE cell_Block
+    SET occupancy = occupancy - 1
+    WHERE cellBlockID = (SELECT cellBlockID FROM cell WHERE cellNo = OLD.cellNo);
+END$$
+DELIMITER ;
+
+
+
+
+
+
