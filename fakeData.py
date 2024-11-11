@@ -9,7 +9,7 @@ connection = mysql.connector.connect(
     host="localhost",
     port=3306,
     user="root",
-    password="adminadmin",
+    password="Jackpine33",
     database="prisoner_System"
 )
 cursor = connection.cursor()
@@ -135,7 +135,7 @@ try:
             enrolled_courses.add(program_id)
 
     cursor.executemany("""
-        INSERT INTO prisoner_Education (prisonerStudentID, programID, grade, attendance)
+        INSERT INTO prisoner_Education (prisonerID, programID, grade, attendance)
         VALUES (%s, %s, %s, %s)
     """, prisoner_education_data)
     connection.commit()
