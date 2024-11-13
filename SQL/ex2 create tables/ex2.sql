@@ -43,10 +43,10 @@ CREATE TABLE prisoner_Education(prisonerID INT NOT NULL,
                                 FOREIGN KEY (programID) REFERENCES education_Course(programID));
 CREATE TABLE incident_Report(incidentReportID INT PRIMARY KEY,
 							prisonerID INT NOT NULL,
-                            guardBadgeNo INT,
+                            badgeNo INT,
                             incidentReportDate DATE NOT NULL,
                             FOREIGN KEY (prisonerID) REFERENCES prisoner(prisonerID),
-                            FOREIGN KEY (guardBadgeNo) REFERENCES guard(badgeNo)); 
+                            FOREIGN KEY (badgeNo) REFERENCES guard(badgeNo)); 
 CREATE TABLE prison_Transfer_Report(transferReportID INT PRIMARY KEY,
 									prisonerID INT NOT NULL,
                                     transferReportDate DATE NOT NULL,

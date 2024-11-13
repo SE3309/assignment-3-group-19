@@ -1,0 +1,9 @@
+This script uses faker in python to create fake data. The script establishes
+a connection to the database using the mysql connector, and takes in the 
+password, database, and user. It then inputs all of the data into the database
+part by part. It does this by using the functionality of faker and random to 
+generate random names, choices, numbers, etc. The inputs are entered in a
+ specific order to minimize conflicts in the inputs, in terms of foreign keys.
+The data is created using loops, and inserted with sql statements. There are
+ some cases of if statments to make sure that the inputs are not violating 
+ any rules set by the database
