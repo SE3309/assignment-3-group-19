@@ -1,16 +1,3 @@
-Update select statements
-Max
-Avg
-Group by
-Count
-
-Make sure each relation has 5 queries, can be very very simple, or very complex, can be insert, delete, any, honestly just make them simple as fuck
-
-Make updates more complex
-Update threat level by grade of prisoner
-
-For update check the max salary before updating
-
 Explain why select passes and insert fails in views
 
 Add another view
@@ -20,3 +7,5 @@ Add text file explaining py file
 Also move screenshots to beside the statement that executed them
 
 Add DUMP file
+
+Make sure its up to ISO standard

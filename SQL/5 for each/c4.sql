@@ -1,0 +1,1 @@
+SELECT cellNo FROM cell

@@ -1,7 +1,5 @@
-SELECT prisonerName 
+SELECT p.prisonerName, COUNT(ir.incidentReportID) AS incidentCount
 FROM prisoner p
-WHERE EXISTS (
-    SELECT 1 
-    FROM incident_Report ir 
-    WHERE ir.prisonerID = p.prisonerID AND p.prisonerID>8900
-);
+JOIN incident_Report ir ON ir.prisonerID = p.prisonerID
+WHERE p.prisonerID > 8900
+GROUP BY p.prisonerName;
