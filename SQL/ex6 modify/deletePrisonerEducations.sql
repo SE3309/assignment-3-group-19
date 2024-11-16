@@ -1,5 +1,5 @@
 SET SQL_SAFE_UPDATES = 0;
-
+-- Remove the SQL_SAFE_UPDATES IF NOT USING MYSQL
 DELETE FROM prisoner_Education
 WHERE grade < 75
   AND attendance < 70
